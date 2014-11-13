@@ -1,12 +1,5 @@
 function DesignFilter(filter_domain, filter_style, pass_type, Amax, Amin, wp1, wp2, ws1, ws2)
 
-% Prewarp for digital filter
-if (strcmpi(filter_domain, 'digital'))
-    wp1 = Prewarp(wp1);
-    wp2 = Prewarp(wp2);
-    ws1 = Prewarp(ws1);
-    ws2 = Prewarp(ws2);
-end
 
 % Make filter symmetric
 if (strcmpi(pass_type, 'bandpass'))
@@ -26,6 +19,12 @@ end
 % Find wp and ws
 wp = wp2 - wp1;
 ws = ws2 - ws1;
+
+% Prewarp for digital filter
+if (strcmpi(filter_domain, 'digital'))
+    wp = Prewarp(wp);
+    ws = Prewarp(ws);
+end
 
 % Normalize wp and ws
 if (strcmpi(pass_type, 'lowpass') || strcmpi(pass_type, 'bandpass'))
@@ -54,13 +53,11 @@ if (strcmpi(pass_type, 'bandpass') || strcmpi(pass_type, 'notchpass'))
     coef = CF;
 end
 
-% Multiply wp back into poles
-poles = coef.*poles;
-
 % Bilinear Transformation to revert back to normal poles
 if (strcmpi(filter_domain, 'digital'))
-    poles = (2+poles)./(2-poles);
+    wp = Prewarp(wp);
+    ws = Prewarp(ws);
 end
 
 % Display poles
-DispPoles(filter_domain, n, poles);
+DispPoles(n, coef, poles);
